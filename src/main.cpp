@@ -26,7 +26,7 @@ std::vector<Token> tokenize(const std::string& str){
     if (std::isalpha(c)) {
       buf.push_back(c);
       i++;
-      while (std::isalpha(str[i])) {
+      while (std::isalnum(str[i])) {
         buf.push_back(str[i]);
         i++;
       }
