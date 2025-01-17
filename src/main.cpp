@@ -37,12 +37,11 @@ std::vector<Token> tokenize(const std::string& str){
         buf.clear();
         continue;
       }
-      else {
-        std::cerr << "You messed up!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
+      std::cerr << "You messed up!" << std::endl;
+      exit(EXIT_FAILURE);
     }
-    else if (std::isdigit(c)) {
+
+    if (std::isdigit(c)) {
       buf.push_back(c);
       i++;
       while (std::isdigit(str[i])) {
@@ -56,9 +55,7 @@ std::vector<Token> tokenize(const std::string& str){
     else if (c == ';') {
       tokens.push_back({.type = TokenType::semicolon});
     }
-    else if (std::isspace(c)) {
-      continue;
-    }
+    else if (std::isspace(c)) {}
     else {
       std::cerr << "You messed up!" << std::endl;
       exit(EXIT_FAILURE);
