@@ -101,9 +101,8 @@ int main(int argc, char* argv[]){
     contents = contents_stream.str();
   }
 
-  std::vector<Token> tokens = tokenize(contents);
-
   {
+    std::vector<Token> tokens = tokenize(contents);
     std::fstream file("out.asm", std::ios::out);
     file << tokens_to_asm(tokens);
   }
