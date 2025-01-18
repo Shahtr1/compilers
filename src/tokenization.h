@@ -4,21 +4,18 @@
 #include<vector>
 #include<string>
 
-enum class TokenType
-{
+enum class TokenType{
     exit,
     int_literal,
     semicolon,
 };
 
-struct Token
-{
+struct Token{
     TokenType type;
     std::optional<std::string> value;
 };
 
-class Tokenizer
-{
+class Tokenizer{
 public:
     explicit Tokenizer(std::string src): m_src(std::move(src)){}
 
