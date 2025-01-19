@@ -1,5 +1,5 @@
 #pragma once
-#include "tokenization.h"
+#include "tokenizer.h"
 
 struct NodeExpr{
     Token int_lit;
@@ -50,8 +50,8 @@ private:
     const std::vector<Token> m_tokens;
     size_t m_index = 0;
 
-    [[nodiscard]] std::optional<Token> peek(int ahead = 1) const{
-        if (m_index + ahead > m_tokens.size()) {
+    [[nodiscard]] std::optional<Token> peek() const{
+        if (m_index >= m_tokens.size()) {
             return {};
         }
         return m_tokens.at(m_index);
