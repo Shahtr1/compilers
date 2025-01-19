@@ -8,6 +8,11 @@ enum class TokenType{
     exit,
     int_literal,
     semicolon,
+    open_paren,
+    close_paren,
+    ident,
+    let,
+    eq
 };
 
 struct Token{
@@ -33,9 +38,13 @@ public:
                     tokens.push_back(Token(TokenType::exit));
                     buf.clear();
                 }
+                else if (buf == "let") {
+                    tokens.push_back({.type = TokenType::let});
+                    buf.clear();
+                }
                 else {
-                    std::cerr << "You messed up!" << std::endl;
-                    exit(EXIT_FAILURE);
+                    tokens.push_back({.type = TokenType::ident, .value = buf});
+                    buf.clear();
                 }
             }
             else if (std::isdigit(peek().value())) {
@@ -46,9 +55,21 @@ public:
                 tokens.push_back({.type = TokenType::int_literal, .value = buf});
                 buf.clear();
             }
+            else if (peek().value() == '(') {
+                consume();
+                tokens.push_back({.type = TokenType::open_paren});
+            }
+            else if (peek().value() == ')') {
+                consume();
+                tokens.push_back({.type = TokenType::close_paren});
+            }
             else if (peek().value() == ';') {
                 consume();
                 tokens.push_back({.type = TokenType::semicolon});
+            }
+            else if (peek().value() == '=') {
+                consume();
+                tokens.push_back({.type = TokenType::eq});
             }
             else if (std::isspace(peek().value())) {
                 consume();
@@ -67,11 +88,11 @@ private:
 
     int m_index = 0;
 
-    [[nodiscard]] std::optional<char> peek() const{
-        if (m_index >= m_src.size()) {
+    [[nodiscard]] std::optional<char> peek(int offset = 0) const{
+        if (m_index + offset >= m_src.size()) {
             return {};
         }
-        return m_src[m_index];
+        return m_src[m_index + offset];
     }
 
     char consume(){
