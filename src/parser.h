@@ -113,6 +113,7 @@ public:
                 exit(EXIT_FAILURE);
             }
         }
+        return prog;
     }
 
 private:

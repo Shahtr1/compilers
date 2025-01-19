@@ -35,7 +35,7 @@ public:
                     buf.push_back(consume());
                 }
                 if (buf == "exit") {
-                    tokens.push_back(Token(TokenType::exit));
+                    tokens.push_back({.type = TokenType::exit});
                     buf.clear();
                 }
                 else if (buf == "let") {
