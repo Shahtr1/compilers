@@ -3,7 +3,7 @@
 
 class Generator{
 public:
-    explicit Generator(NodeProg root): m_prog(std::move(root)){}
+    explicit Generator(NodeProg prog): m_prog(std::move(prog)){}
 
     void gen_expr(const NodeExpr& expr){
         struct ExprVisitor{
