@@ -10,8 +10,8 @@ public:
             Generator* gen;
 
             void operator()(const NodeExprIntLit& expr_int_lit) const{
-                gen->m_output << "mov rax, " << expr_int_lit.int_lit.value.value() << "\n";
-                gen->m_output << "push rax\n";
+                gen->m_output << "    mov rax, " << expr_int_lit.int_lit.value.value() << "\n";
+                gen->m_output << "    push rax\n";
             }
 
             void operator()(const NodeExprIdent& expr_ident){
@@ -42,13 +42,14 @@ public:
     }
 
     [[nodiscard]] std::string gen_prog(){
-        std::stringstream m_output;
         m_output << "global _start\n_start:\n";
-
         for (const NodeStmt& stmt : m_prog.stmts) {
             gen_stmt(stmt);
         }
 
+        m_output << "    mov rax, 60\n";
+        m_output << "    mov rdi, 0\n";
+        m_output << "    syscall\n";
         return m_output.str();
     }
 
