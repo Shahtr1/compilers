@@ -7,4 +7,6 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(hydro src/main.cpp
         src/tokenizer.h
         src/parser.h
-        src/generator.h)
+        src/generator.h
+        src/arena.h
+        src/arena.h)
