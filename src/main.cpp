@@ -7,7 +7,6 @@
 #include "./generator.h"
 #include "./parser.h"
 #include "./tokenizer.h"
-#include "./arena.h"
 
 int main(int argc, char* argv[]){
     if (argc != 2) {

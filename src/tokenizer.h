@@ -13,8 +13,20 @@ enum class TokenType{
     ident,
     let,
     eq,
-    plus
+    plus,
+    star
 };
+
+inline std::optional<int> bin_prec(TokenType type){
+    switch (type) {
+    case TokenType::plus:
+        return 1;
+    case TokenType::star:
+        return 2;
+    default:
+        return {};
+    }
+}
 
 struct Token{
     TokenType type;
@@ -75,6 +87,10 @@ public:
             else if (peek().value() == '+') {
                 consume();
                 tokens.push_back({.type = TokenType::plus});
+            }
+            else if (peek().value() == '*') {
+                consume();
+                tokens.push_back({.type = TokenType::star});
             }
             else if (std::isspace(peek().value())) {
                 consume();

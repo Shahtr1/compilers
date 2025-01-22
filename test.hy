@@ -1,3 +1,3 @@
-let x = 1 + 2 + 3 + 4;
-let y = 19;
-exit(x);
+let x = 1 * 2 + 3;
+let y = x * 5;
+exit(y);
