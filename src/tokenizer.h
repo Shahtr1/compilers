@@ -20,9 +20,9 @@ enum class TokenType{
 inline std::optional<int> bin_prec(TokenType type){
     switch (type) {
     case TokenType::plus:
-        return 1;
+        return 0;
     case TokenType::star:
-        return 2;
+        return 1;
     default:
         return {};
     }
