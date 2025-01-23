@@ -1,6 +1,6 @@
 #pragma once
 #include <cassert>
-#include <unordered_map>
+#include <map>
 
 #include "parser.h"
 
@@ -18,13 +18,19 @@ public:
             }
 
             void operator()(const NodeTermIdent* term_ident) const{
-                if (!gen->m_vars.contains(term_ident->ident.value.value())) {
+                const auto it = std::find_if(
+                    gen->m_vars.cbegin(),
+                    gen->m_vars.cend(),
+                    [&](const Var& var){
+                        return var.name == term_ident->ident.value.value();
+                    });
+
+                if (it == gen->m_vars.cend()) {
                     std::cerr << "Undeclared identifier: " << term_ident->ident.value.value() << std::endl;
                     exit(EXIT_FAILURE);
                 }
-                const auto& var = gen->m_vars.at(term_ident->ident.value.value());
                 std::stringstream offset;
-                offset << "QWORD [rsp + " << (gen->m_stack_size - var.stack_loc - 1) * 8 << "]\n";
+                offset << "QWORD [rsp + " << (gen->m_stack_size - (*it).stack_loc - 1) * 8 << "]";
                 gen->push(offset.str());
             }
 
@@ -110,13 +116,29 @@ public:
             }
 
             void operator()(const NodeStmtLet* stmt_let) const{
-                if (gen->m_vars.contains(stmt_let->ident.value.value())) {
+                const auto it = std::find_if(
+                    gen->m_vars.cbegin(),
+                    gen->m_vars.cend(),
+                    [&](const Var& var){
+                        return var.name == stmt_let->ident.value.value();
+                    });
+                if (it != gen->m_vars.cend()) {
                     std::cerr << "Identifier already used: " << stmt_let->ident.value.value() << std::endl;
                     exit(EXIT_FAILURE);
                 }
 
-                gen->m_vars.insert({stmt_let->ident.value.value(), Var{.stack_loc = gen->m_stack_size}});
+                gen->m_vars.push_back(
+                    {.name = stmt_let->ident.value.value(), .stack_loc = gen->m_stack_size}
+                );
                 gen->gen_expr(stmt_let->expr);
+            }
+
+            void operator()(const NodeStmtScope* stmt_scope) const{
+                gen->begin_scope();
+                for (const NodeStmt* stmt : stmt_scope->stmts) {
+                    gen->gen_stmt(stmt);
+                }
+                gen->end_scope();
             }
         };
 
@@ -147,12 +169,28 @@ private:
         m_stack_size--;
     }
 
+    void begin_scope(){
+        m_scopes.push_back(m_vars.size());
+    }
+
+    void end_scope(){
+        const size_t pop_count = m_vars.size() - m_scopes.back();
+        m_output << "    add rsp, " << pop_count * 8 << "\n";
+        m_stack_size -= pop_count;
+        for (int i = 0; i < pop_count; i++) {
+            m_vars.pop_back();
+        }
+        m_scopes.pop_back();
+    }
+
     struct Var{
+        std::string name;
         size_t stack_loc;
     };
 
     const NodeProg m_prog;
     std::stringstream m_output;
     size_t m_stack_size = 0;
-    std::unordered_map<std::string, Var> m_vars{};
+    std::vector<Var> m_vars{};
+    std::vector<size_t> m_scopes{};
 };

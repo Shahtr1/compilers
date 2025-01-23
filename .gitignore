@@ -36,3 +36,4 @@ cmake-build-relwithdebinfo
 
 *.iml
 *.idea
+build
