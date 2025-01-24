@@ -1,14 +1,6 @@
-let x = (10 - 2 * 3) / 2;
-{
-    let y = 2;
-    let z1 = 69;
-    let z2 = 69;
-    let z3 = 69;
-    let z4 = 69;
-    {
-        let z = 69;
-        exit(z);
-    }
+let y = (10 - 2 * 3) / 2;
+let x = 1;
+if (y - 2) {
+    exit(69);
 }
-let y = x + 5;
-exit(y);
+exit(1);
