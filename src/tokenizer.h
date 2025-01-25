@@ -22,7 +22,7 @@ enum class TokenType{
     if_
 };
 
-inline std::optional<int> bin_prec(TokenType type){
+inline std::optional<int> bin_prec(TokenType const type){
     switch (type) {
     case TokenType::plus:
     case TokenType::minus:
@@ -136,7 +136,8 @@ private:
 
     int m_index = 0;
 
-    [[nodiscard]] std::optional<char> peek(int offset = 0) const{
+    [[nodiscard]] std::optional<char> peek() const{
+        constexpr int offset = 0;
         if (m_index + offset >= m_src.size()) {
             return {};
         }

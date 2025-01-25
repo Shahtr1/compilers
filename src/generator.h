@@ -30,7 +30,7 @@ public:
                     exit(EXIT_FAILURE);
                 }
                 std::stringstream offset;
-                offset << "QWORD [rsp + " << (gen.m_stack_size - (*it).stack_loc - 1) * 8 << "]";
+                offset << "QWORD [rsp + " << (gen.m_stack_size - it->stack_loc - 1) * 8 << "]";
                 gen.push(offset.str());
             }
 
@@ -146,7 +146,7 @@ public:
             }
 
             void operator()(const NodeStmtIf* stmt_if) const{
-                gen.gen_expr((stmt_if->expr));
+                gen.gen_expr(stmt_if->expr);
                 gen.pop("rax");
                 const std::string label = gen.create_label();
                 gen.m_output << "    cmp rax, 0\n";

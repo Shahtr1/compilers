@@ -57,7 +57,7 @@ struct NodeStmtExit{
 
 struct NodeStmtLet{
     Token ident;
-    NodeExpr* expr;
+    NodeExpr* expr{};
 };
 
 struct NodeStmt;
@@ -87,7 +87,7 @@ public:
     {}
 
     std::optional<NodeBinExpr*> parse_bin_expr(){
-        if (const auto lhs = parse_expr()) {
+        if (parse_expr()) {
             std::cerr << "Unsupported binary operator" << std::endl;
             exit(EXIT_FAILURE);
         }
@@ -125,7 +125,7 @@ public:
         return {};
     }
 
-    std::optional<NodeExpr*> parse_expr(int min_prec = 0){
+    std::optional<NodeExpr*> parse_expr(int const min_prec = 0){
         std::optional<NodeTerm*> term_lhs = parse_term();
         if (!term_lhs.has_value()) return {};
 
@@ -140,7 +140,7 @@ public:
                 if (!prec.has_value() || prec < min_prec) break;
             }
             else break;
-            Token op = consume();
+            auto [type, value] = consume();
             const int next_min_prec = prec.value() + 1;
             auto expr_rhs = parse_expr(next_min_prec);
             if (!expr_rhs.has_value()) {
@@ -149,29 +149,29 @@ public:
             }
 
             auto expr = m_allocator.alloc<NodeBinExpr>();
-            auto expr_lhs2 = m_allocator.alloc<NodeExpr>();
-            if (op.type == TokenType::plus) {
+            auto const expr_lhs2 = m_allocator.alloc<NodeExpr>();
+            if (type == TokenType::plus) {
                 auto add = m_allocator.alloc<NodeBinExprAdd>();
                 expr_lhs2->var = expr_lhs->var;
                 add->lhs = expr_lhs2;
                 add->rhs = expr_rhs.value();
                 expr->var = add;
             }
-            else if (op.type == TokenType::star) {
+            else if (type == TokenType::star) {
                 auto multi = m_allocator.alloc<NodeBinExprMulti>();
                 expr_lhs2->var = expr_lhs->var;
                 multi->lhs = expr_lhs2;
                 multi->rhs = expr_rhs.value();
                 expr->var = multi;
             }
-            else if (op.type == TokenType::minus) {
+            else if (type == TokenType::minus) {
                 auto sub = m_allocator.alloc<NodeBinExprSub>();
                 expr_lhs2->var = expr_lhs->var;
                 sub->lhs = expr_lhs2;
                 sub->rhs = expr_rhs.value();
                 expr->var = sub;
             }
-            else if (op.type == TokenType::fslash) {
+            else if (type == TokenType::fslash) {
                 auto div = m_allocator.alloc<NodeBinExprDiv>();
                 expr_lhs2->var = expr_lhs->var;
                 div->lhs = expr_lhs2;
@@ -260,7 +260,7 @@ public:
                 exit(EXIT_FAILURE);
             }
             try_consume(TokenType::close_paren, "Expected `)`");
-            if (auto scope = parse_scope()) {
+            if (auto const scope = parse_scope()) {
                 stmt_if->scope = scope.value();
             }
             else {
