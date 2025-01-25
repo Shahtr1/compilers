@@ -79,6 +79,26 @@ public:
                 tokens.push_back({.type = TokenType::int_literal, .value = buf});
                 buf.clear();
             }
+            else if (peek().value() == '/' && peek(1).has_value() && peek(1).value() == '/') {
+                while (peek().has_value() && peek().value() != '\n') {
+                    consume();
+                }
+                consume();
+            }
+            else if (peek().value() == '/' && peek(1).has_value() && peek(1).value() == '*') {
+                consume();
+                consume();
+                while (peek().has_value()) {
+                    if (peek().value() == '*' && peek(1).has_value() && peek(1).value() == '/') {
+                        break;
+                    }
+                    consume();
+                }
+                if (peek().has_value())
+                    consume();
+                if (peek().has_value())
+                    consume();
+            }
             else if (peek().value() == '(') {
                 consume();
                 tokens.push_back({.type = TokenType::open_paren});
@@ -136,8 +156,7 @@ private:
 
     int m_index = 0;
 
-    [[nodiscard]] std::optional<char> peek() const{
-        constexpr int offset = 0;
+    [[nodiscard]] std::optional<char> peek(const int offset = 0) const{
         if (m_index + offset >= m_src.size()) {
             return {};
         }
