@@ -66,11 +66,29 @@ struct NodeScope{
     std::vector<NodeStmt*> stmts;
 };
 
-struct NodeStmtIf{
+struct NodeIfPred;
+
+struct NodeIfPredElif{
     NodeExpr* expr;
+    NodeScope* scope;
+    std::optional<NodeIfPred*> pred;
+};
+
+struct NodeIfPredElse{
     NodeScope* scope;
 };
 
+struct NodeIfPred{
+    std::variant<NodeIfPredElif*, NodeIfPredElse*> var;
+};
+
+struct NodeStmtIf{
+    NodeExpr* expr;
+    NodeScope* scope;
+    std::optional<NodeIfPred*> pred;
+};
+
+// TODO: use using instead of struct
 struct NodeStmt{
     std::variant<NodeStmtExit*, NodeStmtLet*, NodeScope*, NodeStmtIf*> var;
 };
@@ -194,6 +212,47 @@ public:
         return scope;
     }
 
+    std::optional<NodeIfPred*> parse_if_pred(){
+        if (try_consume(TokenType::elif)) {
+            try_consume(TokenType::open_paren, "Expected `(`");
+            auto const elif = m_allocator.alloc<NodeIfPredElif>();
+            if (auto const expr = parse_expr()) {
+                elif->expr = expr.value();
+            }
+            else {
+                std::cerr << "Expected expression" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+
+            try_consume(TokenType::close_paren, "Expected `)`");
+            if (auto const scope = parse_scope()) {
+                elif->scope = scope.value();
+            }
+            else {
+                std::cerr << "Expected scope" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            elif->pred = parse_if_pred();
+            auto pred = m_allocator.alloc<NodeIfPred>();
+            pred->var = elif;
+            return pred;
+        }
+        if (try_consume(TokenType::else_)) {
+            const auto else_ = m_allocator.alloc<NodeIfPredElse>();
+            if (const auto scope = parse_scope()) {
+                else_->scope = scope.value();
+            }
+            else {
+                std::cerr << "Expected scope" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            const auto pred = m_allocator.alloc<NodeIfPred>();
+            pred->var = else_;
+            return pred;
+        }
+        return {};
+    }
+
     std::optional<NodeStmt*> parse_stmt(){
         if (peek().value().type == TokenType::exit && peek(1).has_value()
             && peek(1)->type == TokenType::open_paren) {
@@ -267,6 +326,7 @@ public:
                 std::cerr << "Invalid scope" << std::endl;
                 exit(EXIT_FAILURE);
             }
+            stmt_if->pred = parse_if_pred();
             auto stmt = m_allocator.alloc<NodeStmt>();
             stmt->var = stmt_if;
             return stmt;
