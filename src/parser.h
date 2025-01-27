@@ -88,9 +88,13 @@ struct NodeStmtIf{
     std::optional<NodeIfPred*> pred;
 };
 
-// TODO: use using instead of struct
+struct NodeStmtAssign{
+    Token ident;
+    NodeExpr* expr;
+};
+
 struct NodeStmt{
-    std::variant<NodeStmtExit*, NodeStmtLet*, NodeScope*, NodeStmtIf*> var;
+    std::variant<NodeStmtExit*, NodeStmtLet*, NodeScope*, NodeStmtIf*, NodeStmtAssign*> var;
 };
 
 struct NodeProg{
@@ -295,6 +299,24 @@ public:
 
             auto stmt = m_allocator.alloc<NodeStmt>();
             stmt->var = stmt_let;
+            return stmt;
+        }
+
+        if (peek().has_value() && peek()->type == TokenType::ident
+            && peek(1).has_value() && peek(1)->type == TokenType::eq) {
+            const auto assign = m_allocator.alloc<NodeStmtAssign>();
+            assign->ident = consume();
+            consume();
+            if (const auto expr = parse_expr()) {
+                assign->expr = expr.value();
+            }
+            else {
+                std::cerr << "Expected expression" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            try_consume(TokenType::semicolon, "Expected `;`");
+            const auto stmt = m_allocator.alloc<NodeStmt>();
+            stmt->var = assign;
             return stmt;
         }
 

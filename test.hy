@@ -1,14 +1,16 @@
 let y = (10 - 2 * 3) / 2;
-let x = 1; // first
+let x = 7; // first
 // second
-if (x - 1) {
-    exit(69);
-} elif (x) {
-    exit(68);
+if (0) {
+    x = 1;
+} elif (0) {
+    x = 2;
 } else {
-    exit(67);
+    x = 3;
 }
 /*
 // This is a multi line comment
-exit(4);
+exit(10);
 */
+
+exit(x);
