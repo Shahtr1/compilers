@@ -137,8 +137,6 @@ public:
                 while (peek().has_value() && peek().value() != '\n') {
                     consume();
                 }
-                consume();
-                line_count++;
             }
             else if (peek().value() == '/' && peek(1).has_value() && peek(1).value() == '*') {
                 consume();
@@ -156,43 +154,43 @@ public:
             }
             else if (peek().value() == '(') {
                 consume();
-                tokens.push_back({TokenType::open_paren});
+                tokens.push_back({TokenType::open_paren, line_count});
             }
             else if (peek().value() == ')') {
                 consume();
-                tokens.push_back({TokenType::close_paren});
+                tokens.push_back({TokenType::close_paren, line_count});
             }
             else if (peek().value() == ';') {
                 consume();
-                tokens.push_back({TokenType::semicolon});
+                tokens.push_back({TokenType::semicolon, line_count});
             }
             else if (peek().value() == '=') {
                 consume();
-                tokens.push_back({TokenType::eq});
+                tokens.push_back({TokenType::eq, line_count});
             }
             else if (peek().value() == '+') {
                 consume();
-                tokens.push_back({TokenType::plus});
+                tokens.push_back({TokenType::plus, line_count});
             }
             else if (peek().value() == '*') {
                 consume();
-                tokens.push_back({TokenType::star});
+                tokens.push_back({TokenType::star, line_count});
             }
             else if (peek().value() == '-') {
                 consume();
-                tokens.push_back({TokenType::minus});
+                tokens.push_back({TokenType::minus, line_count});
             }
             else if (peek().value() == '/') {
                 consume();
-                tokens.push_back({TokenType::fslash});
+                tokens.push_back({TokenType::fslash, line_count});
             }
             else if (peek().value() == '{') {
                 consume();
-                tokens.push_back({TokenType::open_curly});
+                tokens.push_back({TokenType::open_curly, line_count});
             }
             else if (peek().value() == '}') {
                 consume();
-                tokens.push_back({TokenType::close_curly});
+                tokens.push_back({TokenType::close_curly, line_count});
             }
             else if (peek().value() == '\n') {
                 consume();
